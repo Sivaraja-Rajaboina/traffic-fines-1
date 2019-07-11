@@ -107,7 +107,22 @@ class TrafficFines:
         if policeRoot is None:
             policeRoot = self.root
         max_fine = self._get_max_fine_amt()
-
+        current = policeRoot
+        stack = []
+        bonus = open('bonus.txt','w')
+        bonus.write('-------------- Bonus -------------\n')
+        while True:
+            if current is not None:
+                stack.append(current)
+                current = current.left
+            elif stack:
+                current = stack.pop()
+                if current.fine_amt >= max_fine:
+                    bonus.write("{key},{value}\n".format(key=current.police_id, value=current.fine_amt))
+                current = current.right
+            else:
+                break
+        bonus.close()
 
     def _get_max_fine_amt(self):
         fine = self.total_fine
@@ -152,7 +167,8 @@ if __name__ == "__main__":
     input_data = traffic_fines.parse_input_file()
     root = None
     for fines in input_data:
-        traffic_fines.insertHash(fines.fine_amt,fines.license_num)
-        root = traffic_fines.insertByPoliceId(root,fines.police_id,fines.fine_amt)
+        traffic_fines.insertHash(fines.fine_amt, fines.license_num)
+        root = traffic_fines.insertByPoliceId(root, fines.police_id, fines.fine_amt)
     traffic_fines.printViolators()
+    traffic_fines.printBonusPolicemen(root)
     traffic_fines.printPoliceTree()
