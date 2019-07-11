@@ -50,22 +50,22 @@ class TrafficFines:
         else:
             police_node = self.find_police_id(policeId)
             if police_node is None:
-                self._add(policeId,amount,self.root)
+                self._add_with_police_id(policeId,amount,self.root)
                 self.total_fine = self.total_fine + amount
             else:
                 police_node.fine_amt = police_node.fine_amt + amount
                 self.total_fine = self.total_fine + amount
         return self.root
 
-    def _add(self, police_id, amount, node):
+    def _add_with_police_id(self, police_id, amount, node):
         if police_id < node.police_id:
             if node.left is not None:
-                self._add(police_id, amount, node.left)
+                self._add_with_police_id(police_id, amount, node.left)
             else:
                 node.left = PoliceNode(police_id,amount)
         else:
             if node.right is not None:
-                self._add(police_id,amount, node.right)
+                self._add_with_police_id(police_id,amount, node.right)
             else:
                 node.right = PoliceNode(police_id,amount)
 
@@ -87,8 +87,20 @@ class TrafficFines:
     def reorderByFineAmount(self, policeRoot):
         if policeRoot is None:
             policeRoot = self.root
-        amountRoot = PoliceNode()
+        amountRoot = PoliceNode(police_id=policeRoot.police_id,fine_amt=policeRoot.fine_amt)
 
+
+    def _add_with_fine_amt(self, police_id, amount, node):
+        if police_id <= node.police_id:
+            if node.left is not None:
+                self._add_with_fine_amt(police_id, amount, node.left)
+            else:
+                node.left = PoliceNode(police_id,amount)
+        else:
+            if node.right is not None:
+                self._add_with_fine_amt(police_id,amount, node.right)
+            else:
+                node.right = PoliceNode(police_id,amount)
 
     def printBonusPolicemen(self, policeRoot):
         if policeRoot is None:
@@ -100,7 +112,6 @@ class TrafficFines:
         fine = self.total_fine
         max_fine = fine * 0.9
         return max_fine
-
 
     def destroyPoliceTree(self, policeRoot):
         policeRoot = None
@@ -114,10 +125,10 @@ class TrafficFines:
 
     def _print_police_tree(self, node):
         if node is not None:
-            self._printTree(node.left)
+            self._print_police_tree(node.left)
             print(str(node.police_id) + ' ')
             print(str(node.ammount) + ' ')
-            self._printTree(node.right)
+            self._print_police_tree(node.right)
 
 
 if __name__ == "__main__":
