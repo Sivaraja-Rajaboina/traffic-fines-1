@@ -10,6 +10,14 @@ class PoliceNode:
         self.right = None
 
 
+class PoliceRecord:
+
+    def __init__(self, police_id, fine_amt,license_num):
+        self.police_id = police_id
+        self.fine_amt = fine_amt
+        self.license_num = license_num
+
+
 class TrafficFines:
 
     def __init__(self):
@@ -130,10 +138,26 @@ class TrafficFines:
             print(str(node.ammount) + ' ')
             self._print_police_tree(node.right)
 
+    def parse_input_file(self, input_file='inputPS3.txt'):
+        input_data = []
+        with open(input_file) as reader:
+            line = reader.readline()
+            while line != '':
+                data = line.strip('\n').split('/')
+                if len(data) < 3:
+                    print('Data is not proper and hence continuing')
+                    continue
+                input_data.append(PoliceRecord(police_id=int(data[0]), license_num= int(data[1]), fine_amt= int(data[2])))
+                line = reader.readline()
+            reader.close()
+        return input_data
+
 
 if __name__ == "__main__":
     traffic_fines = TrafficFines()
     traffic_fines.initializeHash()
-    traffic_fines.insertHash(22, 'tel1')
-    traffic_fines.printViolators()
-    print(traffic_fines.driver_hash_table)
+    input_data = traffic_fines.parse_input_file()
+    for fines in input_data:
+        traffic_fines.insertHash(fines.fine_amt,fines.license_num)
+        traffic_fines.insertByPoliceId(None,fines.police_id,fines.fine_amt)
+        traffic_fines.printViolators()
