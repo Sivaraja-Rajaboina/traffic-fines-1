@@ -53,17 +53,18 @@ class TrafficFines:
 
     def insertByPoliceId(self, policeRoot, policeId, amount):
         if policeRoot is None:
-            self.root = PoliceNode(police_id=policeId,fine_amt=amount)
+            policeRoot = PoliceNode(police_id=policeId,fine_amt=amount)
             self.total_fine = amount
         else:
-            police_node = self.find_police_id(policeId)
+            police_node = self.search_police_node(policeRoot,policeId)
             if police_node is None:
-                self._add_with_police_id(policeId,amount,self.root)
+                self._add_with_police_id(policeId,amount,policeRoot)
                 self.total_fine = self.total_fine + amount
             else:
                 police_node.fine_amt = police_node.fine_amt + amount
                 self.total_fine = self.total_fine + amount
-        return self.root
+        self.root = policeRoot
+        return policeRoot
 
     def _add_with_police_id(self, police_id, amount, node):
         if police_id < node.police_id:
@@ -77,20 +78,12 @@ class TrafficFines:
             else:
                 node.right = PoliceNode(police_id,amount)
 
-    def find_police_id(self,police_id):
-        if self.root is not None:
-            return self._find_police_id(police_id, self.root)
-        else:
-            return None
-
-    def _find_police_id(self,police_id, node):
-        if police_id == node.police_id:
-            return node
-        elif police_id < node.police_id and node.left is not None:
-            self._find_police_id(police_id, node.left)
-        elif police_id > node.police_id and node.right is not None:
-            self._find_police_id(police_id, node.right)
-
+    def search_police_node(self, root, police_id):
+        if root is None or root.police_id == police_id:
+            return root
+        if root.police_id < police_id:
+            return self.search_police_node(root.right,police_id)
+        return self.search_police_node(root.left, police_id)
 
     def reorderByFineAmount(self, policeRoot):
         if policeRoot is None:
@@ -125,7 +118,7 @@ class TrafficFines:
         policeRoot = None
         self.root = policeRoot
 
-    def printPoliceTree(self, policeRoot):
+    def printPoliceTree(self, policeRoot=None):
         if policeRoot is None:
             policeRoot = self.root
         if policeRoot is not None:
@@ -135,7 +128,7 @@ class TrafficFines:
         if node is not None:
             self._print_police_tree(node.left)
             print(str(node.police_id) + ' ')
-            print(str(node.ammount) + ' ')
+            print(str(node.fine_amt) + ' ')
             self._print_police_tree(node.right)
 
     def parse_input_file(self, input_file='inputPS3.txt'):
@@ -157,7 +150,9 @@ if __name__ == "__main__":
     traffic_fines = TrafficFines()
     traffic_fines.initializeHash()
     input_data = traffic_fines.parse_input_file()
+    root = None
     for fines in input_data:
         traffic_fines.insertHash(fines.fine_amt,fines.license_num)
-        traffic_fines.insertByPoliceId(None,fines.police_id,fines.fine_amt)
-        traffic_fines.printViolators()
+        root = traffic_fines.insertByPoliceId(root,fines.police_id,fines.fine_amt)
+    traffic_fines.printViolators()
+    traffic_fines.printPoliceTree()
