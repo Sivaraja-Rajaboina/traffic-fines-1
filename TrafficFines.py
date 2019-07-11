@@ -1,8 +1,9 @@
 #!/bin/python3
 
+
 class PoliceNode:
 
-    def __init__(self,police_id,fine_amt):
+    def __init__(self, police_id, fine_amt):
         self.police_id = police_id
         self.fine_amt = fine_amt
         self.left = None
@@ -18,7 +19,7 @@ class TrafficFines:
         self.driver_hash_table = {}
         print('driver map initialized')
 
-    def insertHash(self,voilations, lic):
+    def insertHash(self, voilations, lic):
         table_lic = self.driver_hash_table.get(lic)
         if table_lic is None:
             self.driver_hash_table[lic] = voilations
