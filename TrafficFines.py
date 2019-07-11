@@ -14,6 +14,8 @@ class TrafficFines:
 
     def __init__(self):
         self.driver_hash_table = None
+        self.root = None
+        self.total_fine = 0
 
     def initializeHash(self):
         self.driver_hash_table = {}
@@ -33,33 +35,93 @@ class TrafficFines:
         voilators.write("--------------Violators-------------\n")
         for k, v in driverhash.items():
             if v >= 3:
-                voilators.write("{key},{value}\n".format(key = k,value = v))
+                voilators.write("{key},{value}\n".format(key=k, value=v))
         voilators.close()
 
-    def destroyHash(self,driverhash):
+    def destroyHash(self, driverhash):
         if driverhash is None:
             driverhash = self.driver_hash_table
         driverhash.clear()
 
-    def insertByPoliceId(self,policeRoot, policeId, amount):
-        pass
+    def insertByPoliceId(self, policeRoot, policeId, amount):
+        if policeRoot is None:
+            self.root = PoliceNode(police_id=policeId,fine_amt=amount)
+            self.total_fine = amount
+        else:
+            police_node = self.find_police_id(policeId)
+            if police_node is None:
+                self._add(policeId,amount,self.root)
+                self.total_fine = self.total_fine + amount
+            else:
+                police_node.fine_amt = police_node.fine_amt + amount
+                self.total_fine = self.total_fine + amount
+        return self.root
 
-    def reorderByFineAmount(self,policeRoot):
-        pass
+    def _add(self, police_id, amount, node):
+        if police_id < node.police_id:
+            if node.left is not None:
+                self._add(police_id, amount, node.left)
+            else:
+                node.left = PoliceNode(police_id,amount)
+        else:
+            if node.right is not None:
+                self._add(police_id,amount, node.right)
+            else:
+                node.right = PoliceNode(police_id,amount)
 
-    def printBonusPolicemen(self,policeRoot):
-        pass
+    def find_police_id(self,police_id):
+        if self.root is not None:
+            return self._find_police_id(police_id, self.root)
+        else:
+            return None
 
-    def destroyPoliceTree(self,policeRoot):
-        pass
+    def _find_police_id(self,police_id, node):
+        if police_id == node.police_id:
+            return node
+        elif police_id < node.police_id and node.left is not None:
+            self._find_police_id(police_id, node.left)
+        elif police_id > node.police_id and node.right is not None:
+            self._find_police_id(police_id, node.right)
 
-    def printPoliceTree(self,policeRoot):
-        pass
+
+    def reorderByFineAmount(self, policeRoot):
+        if policeRoot is None:
+            policeRoot = self.root
+
+
+    def printBonusPolicemen(self, policeRoot):
+        if policeRoot is None:
+            policeRoot = self.root
+        max_fine = self._get_max_fine_amt()
+
+
+    def _get_max_fine_amt(self):
+        fine = self.total_fine
+        max_fine = fine * 0.9
+        return max_fine
+
+
+    def destroyPoliceTree(self, policeRoot):
+        policeRoot = None
+        self.root = policeRoot
+
+    def printPoliceTree(self, policeRoot):
+        if policeRoot is None:
+            policeRoot = self.root
+        if policeRoot is not None:
+            self._print_police_tree(policeRoot)
+
+    def _print_police_tree(self, node):
+        if node is not None:
+            self._printTree(node.left)
+            print(str(node.police_id) + ' ')
+            print(str(node.ammount) + ' ')
+            self._printTree(node.right)
 
 
 if __name__ == "__main__":
     traffic_fines = TrafficFines()
     traffic_fines.initializeHash()
-    traffic_fines.insertHash(22,'tel1')
+    traffic_fines.insertHash(22, 'tel1')
     traffic_fines.printViolators()
     print(traffic_fines.driver_hash_table)
