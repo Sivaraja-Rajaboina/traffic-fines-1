@@ -87,6 +87,7 @@ class TrafficFines:
     def reorderByFineAmount(self, policeRoot):
         if policeRoot is None:
             policeRoot = self.root
+        amountRoot = PoliceNode()
 
 
     def printBonusPolicemen(self, policeRoot):
