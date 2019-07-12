@@ -130,7 +130,10 @@ class TrafficFines:
         return max_fine
 
     def destroyPoliceTree(self, policeRoot):
-        policeRoot = None
+        policeRoot.right = None
+        policeRoot.left = None
+        policeRoot.police_id = None
+        policeRoot.fine_amt = None
         self.root = policeRoot
 
     def printPoliceTree(self, policeRoot=None):
@@ -142,8 +145,7 @@ class TrafficFines:
     def _print_police_tree(self, node):
         if node is not None:
             self._print_police_tree(node.left)
-            print(str(node.police_id) + ' ')
-            print(str(node.fine_amt) + ' ')
+            print('Police Id: ' +str(node.police_id) + ' Fine Amount: '+str(node.fine_amt))
             self._print_police_tree(node.right)
 
     def parse_input_file(self, input_file='inputPS3.txt'):
@@ -172,3 +174,6 @@ if __name__ == "__main__":
     traffic_fines.printViolators()
     traffic_fines.printBonusPolicemen(root)
     traffic_fines.printPoliceTree()
+    print('police tree destroy initialized')
+    traffic_fines.destroyPoliceTree(root)
+    traffic_fines.printPoliceTree(root)
