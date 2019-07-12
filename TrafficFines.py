@@ -135,8 +135,7 @@ class TrafficFines:
 
     def destroyPoliceTree(self, policeRoot):
         self.root = None
-        policeRoot = None
-        return policeRoot
+        policeRoot = self.root
 
     def printPoliceTree(self, policeRoot=None):
         if policeRoot is None:
@@ -169,15 +168,14 @@ if __name__ == "__main__":
     traffic_fines = TrafficFines()
     driverHash = traffic_fines.initializeHash()
     input_data = traffic_fines.parse_input_file()
-    root = None
     for fines in input_data:
         traffic_fines.insertHash(driverHash, fines.license_num)
-        root = traffic_fines.insertByPoliceId(root, fines.police_id, fines.fine_amt)
-        traffic_fines.printPoliceTree()
+        traffic_fines.root = traffic_fines.insertByPoliceId(traffic_fines.root, fines.police_id, fines.fine_amt)
     traffic_fines.printViolators(driverHash)
     traffic_fines.destroyHash(driverHash)
-    traffic_fines.printBonusPolicemen(root)
+    traffic_fines.printBonusPolicemen(traffic_fines.root)
     traffic_fines.printPoliceTree()
     print('police tree destroy initialized')
-    root = traffic_fines.destroyPoliceTree(root)
-    traffic_fines.printPoliceTree(root)
+    traffic_fines.destroyPoliceTree(traffic_fines.root)
+    print('police tree destroyed')
+    traffic_fines.printPoliceTree(traffic_fines.root)
