@@ -88,12 +88,27 @@ class TrafficFines:
         if root.police_id < police_id:
             return self.search_police_node(root.right,police_id)
         return self.search_police_node(root.left, police_id)
+    
+    
+    def transferTreeByAmount(self, amountRoot, policeRoot):
+        if policeRoot is None:
+            return
+        if amountRoot.fine_amt <= policeRoot.left:
+            amountRoot.left = policeRoot.left
+            amountRoot.right = policeRoot.right
+        else:
+            amountRoot.left = policeRoot.right
+            amountRoot.right = policeRoot.left
+        self.transferTreeByAmount(amountRoot.left, policeRoot.left)
+        self.transferTreeByAmount(amountRoot.right, policeRoot.right)
 
     def reorderByFineAmount(self, policeRoot):
-        if policeRoot is None:
-            policeRoot = self.root
-        amountRoot = PoliceNode(police_id=policeRoot.police_id,fine_amt=policeRoot.fine_amt)
-
+        #amountRoot = PoliceNode(police_id=policeRoot.police_id,fine_amt=policeRoot.fine_amt)
+        amountRoot = policeRoot
+        self.transferTreeByAmount(policeRoot, policeRoot)
+        self.root = amountRoot
+        return amountRoot
+        
 
     def _add_with_fine_amt(self, police_id, amount, node):
         if police_id <= node.police_id:
@@ -134,7 +149,7 @@ class TrafficFines:
         return max_fine
 
     def destroyPoliceTree(self, policeRoot):
-        self.root = None
+        self.root = None       
         policeRoot = self.root
 
     def printPoliceTree(self, policeRoot=None):
@@ -172,8 +187,10 @@ if __name__ == "__main__":
         traffic_fines.insertHash(driverHash, fines.license_num)
         traffic_fines.root = traffic_fines.insertByPoliceId(traffic_fines.root, fines.police_id, fines.fine_amt)
     traffic_fines.printViolators(driverHash)
-    traffic_fines.destroyHash(driverHash)
+    #traffic_fines.destroyHash(driverHash)
     traffic_fines.printBonusPolicemen(traffic_fines.root)
+    traffic_fines.printPoliceTree()
+    traffic_fines.reorderByFineAmount(traffic_fines.root)
     traffic_fines.printPoliceTree()
     print('police tree destroy initialized')
     traffic_fines.destroyPoliceTree(traffic_fines.root)
